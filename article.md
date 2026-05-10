@@ -1,60 +1,38 @@
+---
+author: "Kyle Jones"
+date_published: "October 7, 2025"
+date_exported_from_medium: "November 10, 2025"
+canonical_link: "https://medium.com/@kyle-t-jones/forecasting-ore-grade-variability-with-open-geochemistry-and-machine-learning-e9b08c45f9af"
+---
+
 # Forecasting Ore Grade Variability with Open Geochemistry and Machine Learning Miners combine geochemical data with modern machine learning to predict
 grade, quantify risk, and optimize sampling strategies.
 
 ### Forecasting Ore Grade Variability with Open Geochemistry and Machine Learning
-Miners combine geochemical data with modern machine learning to predict
-grade, quantify risk, and optimize sampling strategies.
+Miners combine geochemical data with modern machine learning to predict grade, quantify risk, and optimize sampling strategies.
 
-Drillholes give point samples. Mines need continuous grade maps. The gap
-between sparse measurements and dense predictions has traditionally been
-filled by geostatistical methods like Ordinary Kriging. But when you add
-machine learning to geochemical covariates, you unlock probabilistic
-forecasts that reveal not just where the gold is, but where your
-predictions are most uncertain --- critical intelligence for adaptive
-drilling and pit design.
+Drillholes give point samples. Mines need continuous grade maps. The gap between sparse measurements and dense predictions has traditionally been filled by geostatistical methods like Ordinary Kriging. But when you add machine learning to geochemical covariates, you unlock probabilistic forecasts that reveal not just where the gold is, but where your predictions are most uncertain --- critical intelligence for adaptive drilling and pit design.
 
 
-This project uses gold grade predictions across Western Australia using
-three methods: Ordinary Kriging (traditional geostatistics), Gaussian
-Process Regression (probabilistic ML), and XGBoost (gradient boosting).
-The GPR model reveals prediction uncertainty, highlighting zones
-requiring additional sampling.
+This project uses gold grade predictions across Western Australia using three methods: Ordinary Kriging (traditional geostatistics), Gaussian Process Regression (probabilistic ML), and XGBoost (gradient boosting). The GPR model reveals prediction uncertainty, highlighting zones requiring additional sampling.
 
 ### The Data: Australia's National Geochemical Survey
-The National Geochemical Survey of Australia (NGSA) collected regolith
-and sediment samples across 1,315 sites in 1,186 catchments covering 81%
-of the continent. Each site was sampled at two depths (0--10 cm surface,
-60--80 cm subsurface) and two grain size fractions (\<2 mm coarse, \<75
-µm fine), yielding concentrations for 68 elements.
+The National Geochemical Survey of Australia (NGSA) collected regolith and sediment samples across 1,315 sites in 1,186 catchments covering 81% of the continent. Each site was sampled at two depths (0--10 cm surface, 60--80 cm subsurface) and two grain size fractions (\<2 mm coarse, \<75 µm fine), yielding concentrations for 68 elements.
 
-This continental-scale dataset is sparse compared to mine-scale
-drillhole data, but it's perfect for demonstrating grade forecasting
-methods because it's open and reproducible and includes multi-element
-assays.
+This continental-scale dataset is sparse compared to mine-scale drillhole data, but it's perfect for demonstrating grade forecasting methods because it's open and reproducible and includes multi-element assays.
 
-For this analysis, we focus on a subregion of Western Australia where
-sample density is sufficient for spatial modeling. With proprietary mine
-data, you'd drop the regional filtering and apply the same pipeline to
-drillhole intercepts.
+For this analysis, we focus on a subregion of Western Australia where sample density is sufficient for spatial modeling. With proprietary mine data, you'd drop the regional filtering and apply the same pipeline to drillhole intercepts.
 
 ### Problem Formulation
-We predict gold concentration (Au, ppm) at unsampled locations using
-three methods:
+We predict gold concentration (Au, ppm) at unsampled locations using three methods:
 
-1.  [Ordinary Kriging --- Traditional geostatistical interpolation based
-    on spatial correlation alone]
-2.  [Gaussian Process Regression --- Probabilistic ML that combines
-    spatial patterns with geochemical covariates]
-3.  [Gradient Boosted Trees (XGBoost) --- Non-parametric ensemble method
-    optimized for speed and accuracy]
+1.  [Ordinary Kriging --- Traditional geostatistical interpolation based on spatial correlation alone]
+2.  [Gaussian Process Regression --- Probabilistic ML that combines spatial patterns with geochemical covariates]
+3.  [Gradient Boosted Trees (XGBoost) --- Non-parametric ensemble method optimized for speed and accuracy]
 
-We evaluate both predictive accuracy (MAE, RMSE) and uncertainty
-calibration (coverage of confidence intervals).
+We evaluate both predictive accuracy (MAE, RMSE) and uncertainty calibration (coverage of confidence intervals).
 
-The key insight: when geochemical covariates (Cu, As, Fe, S, Pb) add
-signal beyond spatial proximity, ML methods outperform pure
-interpolation. But only GPR provides calibrated uncertainty estimates
-critical for risk management.
+The key insight: when geochemical covariates (Cu, As, Fe, S, Pb) add signal beyond spatial proximity, ML methods outperform pure interpolation. But only GPR provides calibrated uncertainty estimates critical for risk management.
 
 ### Data Preparation and Feature Engineering
 ```python
@@ -210,20 +188,12 @@ Created 5 spatial folds:
   Fold 4: 50 samples
 ```
 
-The log transform is critical: gold concentrations are log-normally
-distributed in nature. Modeling in log-space improves both numerical
-stability and prediction accuracy.
+The log transform is critical: gold concentrations are log-normally distributed in nature. Modeling in log-space improves both numerical stability and prediction accuracy.
 
-Spatial cross-validation prevents data leakage. Standard k-fold CV would
-allow nearby training points to "cheat" by essentially interpolating to
-nearby test points. By splitting on x-coordinate bands, we ensure
-genuine spatial prediction.
+Spatial cross-validation prevents data leakage. Standard k-fold CV would allow nearby training points to "cheat" by essentially interpolating to nearby test points. By splitting on x-coordinate bands, we ensure genuine spatial prediction.
 
 ### Baseline: Ordinary Kriging
-Kriging is the gold standard (pun intended) for spatial interpolation in
-mining. It's a Best Linear Unbiased Predictor (BLUP) that weights nearby
-observations based on their spatial correlation structure, captured by
-the variogram.
+Kriging is the gold standard (pun intended) for spatial interpolation in mining. It's a Best Linear Unbiased Predictor (BLUP) that weights nearby observations based on their spatial correlation structure, captured by the variogram.
 
 ```python
 def fit_variogram(gdf, plot=False):
@@ -305,20 +275,12 @@ Ordinary Kriging Results:
   Mean kriging variance: 0.312
 ```
 
-The nugget/sill ratio of 24% indicates moderate short-range
-variability --- possibly from sampling error, micro-scale heterogeneity,
-or measurement noise. A pure nugget effect (ratio near 100%) would
-suggest no spatial correlation; a ratio near 0% would indicate perfect
-spatial continuity.
+The nugget/sill ratio of 24% indicates moderate short-range variability --- possibly from sampling error, micro-scale heterogeneity, or measurement noise. A pure nugget effect (ratio near 100%) would suggest no spatial correlation; a ratio near 0% would indicate perfect spatial continuity.
 
-The range of 142.6 km defines the distance beyond which samples are
-essentially uncorrelated. For mine-scale data (drillhole spacing of
-25--50m), you'd expect ranges of 100--500m.
+The range of 142.6 km defines the distance beyond which samples are essentially uncorrelated. For mine-scale data (drillhole spacing of 25--50m), you'd expect ranges of 100--500m.
 
 ### Gaussian Process Regression: Probabilistic ML
-GPR extends Kriging by incorporating additional features (geochemical
-covariates, lithology) while maintaining probabilistic outputs. The
-kernel function defines both spatial correlation and feature similarity.
+GPR extends Kriging by incorporating additional features (geochemical covariates, lithology) while maintaining probabilistic outputs. The kernel function defines both spatial correlation and feature similarity.
 
 ```python
 def train_gaussian_process(gdf, groups):
@@ -428,20 +390,12 @@ GPR Overall Performance:
   Mean Prediction Std: 0.385
 ```
 
-The 94.8% coverage means our confidence intervals are
-well-calibrated --- almost exactly 95% of true values fall within μ ±
-1.96σ. This is rare in ML and incredibly valuable for risk management.
-Poorly calibrated models might claim high confidence when they're wrong.
+The 94.8% coverage means our confidence intervals are well-calibrated --- almost exactly 95% of true values fall within μ ± 1.96σ. This is rare in ML and incredibly valuable for risk management. Poorly calibrated models might claim high confidence when they're wrong.
 
-The Matérn kernel (ν=1.5) provides a good balance between smoothness
-(ν→∞ approaches Gaussian) and roughness (ν=0.5 is exponential). For
-geochemical data with moderate continuity, ν=1.5 or 2.5 works well.
+The Matérn kernel (ν=1.5) provides a good balance between smoothness (ν→∞ approaches Gaussian) and roughness (ν=0.5 is exponential). For geochemical data with moderate continuity, ν=1.5 or 2.5 works well.
 
 ### Gradient Boosted Trees: Speed and Power
-XGBoost sacrifices probabilistic outputs for raw predictive power and
-computational speed. It's the workhorse of modern ML
-competitions --- and increasingly, of mining companies with tight
-deadlines.
+XGBoost sacrifices probabilistic outputs for raw predictive power and computational speed. It's the workhorse of modern ML competitions --- and increasingly, of mining companies with tight deadlines.
 
 ```python
 def train_xgboost(gdf, groups):
@@ -550,16 +504,9 @@ Top Feature Importances:
   S: 0.067
 ```
 
-XGBoost achieves 16% lower MAE than GPR --- a significant gain. But it
-provides no uncertainty estimates. For production forecasting where you
-need to hit tonnage targets, XGBoost is compelling. For resource
-classification (Measured, Indicated, Inferred) where you must quantify
-confidence, you need GPR or quantile regression variants.
+XGBoost achieves 16% lower MAE than GPR --- a significant gain. But it provides no uncertainty estimates. For production forecasting where you need to hit tonnage targets, XGBoost is compelling. For resource classification (Measured, Indicated, Inferred) where you must quantify confidence, you need GPR or quantile regression variants.
 
-Feature importance reveals that spatial coordinates (x, y) dominate,
-followed by pathfinder elements As and Cu. Arsenic is strongly
-associated with orogenic gold deposits; copper often indicates porphyry
-or VHMS mineralization that may contain gold credits.
+Feature importance reveals that spatial coordinates (x, y) dominate, followed by pathfinder elements As and Cu. Arsenic is strongly associated with orogenic gold deposits; copper often indicates porphyry or VHMS mineralization that may contain gold credits.
 
 ### Grid Prediction and Mapping
 ```python
@@ -637,11 +584,7 @@ Grid Predictions Complete:
   OK Au range: 0.002 - 1.923 ppm
 ```
 
-The GPR and XGBoost predictions extend to slightly higher maximum grades
-because they leverage geochemical covariates. In zones with high As and
-Cu but sparse gold assays, these models can extrapolate based on learned
-element associations. Kriging, purely spatial, can only interpolate
-between measured gold values.
+The GPR and XGBoost predictions extend to slightly higher maximum grades because they leverage geochemical covariates. In zones with high As and Cu but sparse gold assays, these models can extrapolate based on learned element associations. Kriging, purely spatial, can only interpolate between measured gold values.
 
 ### Visualizations
 ```python
@@ -788,35 +731,17 @@ Uncertainty Calibration:
 Calibration Correlation: 0.998
 ```
 
-The calibration correlation of 0.998 is exceptional --- predicted
-uncertainty almost perfectly matches actual error. This means when the
-GPR says "I'm 70% confident the grade is between 0.3 and 0.5 ppm," it's
-accurate 70% of the time.
+The calibration correlation of 0.998 is exceptional --- predicted uncertainty almost perfectly matches actual error. This means when the GPR says "I'm 70% confident the grade is between 0.3 and 0.5 ppm," it's accurate 70% of the time.
 
-Poor calibration is common in ML: neural networks often produce
-overconfident predictions (claimed uncertainty too low) or
-underconfident predictions (too high). GPR's principled Bayesian
-approach delivers reliable uncertainty.
+Poor calibration is common in ML: neural networks often produce overconfident predictions (claimed uncertainty too low) or underconfident predictions (too high). GPR's principled Bayesian approach delivers reliable uncertainty.
 
 ### Key Takeaways
-1.  [Geochemical covariates improve accuracy --- XGBoost achieved 16%
-    lower error than spatial interpolation alone by leveraging
-    pathfinder element relationships]
-2.  [Probabilistic forecasts enable risk management --- GPR's calibrated
-    uncertainty identifies high-risk zones requiring additional drilling
-    before production]
-3.  [Spatial cross-validation prevents overfitting --- Standard CV
-    inflates accuracy by 30--50% due to spatial autocorrelation; always
-    use spatial splits]
-4.  [Method selection depends on context --- Use Kriging for regulatory
-    compliance (established in NI 43--101), GPR for resource
-    classification (uncertainty critical), XGBoost for production
-    forecasting (speed and accuracy)]
-5.  [Uncertainty maps guide sampling strategy --- Drill where σ is
-    highest to maximize information gain per dollar spent]
-6.  [Feature importance reveals geology --- Arsenic and copper dominate
-    after spatial coordinates, confirming orogenic gold
-    signatures]
+1.  [Geochemical covariates improve accuracy --- XGBoost achieved 16% lower error than spatial interpolation alone by leveraging pathfinder element relationships]
+2.  [Probabilistic forecasts enable risk management --- GPR's calibrated uncertainty identifies high-risk zones requiring additional drilling before production]
+3.  [Spatial cross-validation prevents overfitting --- Standard CV inflates accuracy by 30--50% due to spatial autocorrelation; always use spatial splits]
+4.  [Method selection depends on context --- Use Kriging for regulatory compliance (established in NI 43--101), GPR for resource classification (uncertainty critical), XGBoost for production forecasting (speed and accuracy)]
+5.  [Uncertainty maps guide sampling strategy --- Drill where σ is highest to maximize information gain per dollar spent]
+6.  [Feature importance reveals geology --- Arsenic and copper dominate after spatial coordinates, confirming orogenic gold signatures]
 
 ### Practical Implementation
 The complete pipeline requires:
@@ -947,22 +872,6 @@ Best Use Cases:
 Pipeline complete!
 ```
 
-Grade forecasting has evolved beyond spatial interpolation. When you
-combine geochemical understanding with modern ML, you gain better
-accuracy through learned element relationships, calibrated uncertainty
-for resource classification and risk management, computational
-efficiency enabling rapid scenario analysis, and actionable insights
-that guide drilling, pit optimization, and hedging strategies.
+Grade forecasting has evolved beyond spatial interpolation. When you combine geochemical understanding with modern ML, you gain better accuracy through learned element relationships, calibrated uncertainty for resource classification and risk management, computational efficiency enabling rapid scenario analysis, and actionable insights that guide drilling, pit optimization, and hedging strategies.
 
-The difference between a \$180 million loss and a profitable quarter
-often comes down to how well you model grade uncertainty. Traditional
-Kriging is defensible but limited. Gaussian Processes add probabilistic
-rigor. XGBoost adds raw power. Use all three --- each has its place in
-the modern mining workflow.
-::::::::By [Kyle Jones](https://medium.com/@kyle-t-jones) on
-[October 7, 2025](https://medium.com/p/e9b08c45f9af).
-
-[Canonical
-link](https://medium.com/@kyle-t-jones/forecasting-ore-grade-variability-with-open-geochemistry-and-machine-learning-e9b08c45f9af)
-
-Exported from [Medium](https://medium.com) on November 10, 2025.
+The difference between a \$180 million loss and a profitable quarter often comes down to how well you model grade uncertainty. Traditional Kriging is defensible but limited. Gaussian Processes add probabilistic rigor. XGBoost adds raw power. Use all three --- each has its place in the modern mining workflow.
