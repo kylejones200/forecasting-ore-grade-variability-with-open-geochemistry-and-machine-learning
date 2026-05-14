@@ -17,13 +17,8 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-# Import Tufte plotting utilities
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from tda_utils import setup_tufte_plot, TufteColors
-
-
 def generate_synthetic_drillhole_data(num_holes=100, domain_size=1000, seed=42):
     """Generate realistic synthetic drillhole assay data."""
     np.random.seed(seed)
