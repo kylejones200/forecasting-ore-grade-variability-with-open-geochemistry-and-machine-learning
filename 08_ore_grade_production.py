@@ -20,8 +20,6 @@ from sklearn.model_selection import cross_val_score, cross_val_predict
 from scipy.spatial.distance import cdist
 import time
 
-import sys
-from pathlib import Path
 def generate_synthetic_drillhole_data(num_holes=120, domain_size=1000, seed=42):
     """Generate realistic synthetic drillhole assay data."""
     np.random.seed(seed)

@@ -17,8 +17,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-import sys
-from pathlib import Path
 def generate_synthetic_drillhole_data(num_holes=100, domain_size=1000, seed=42):
     """Generate realistic synthetic drillhole assay data."""
     np.random.seed(seed)
@@ -303,7 +301,7 @@ def main():
     
     logger.info("\n5. Testing conditional simulation...")
     simulations = conditional_simulation(drillholes, gp_model, n_realizations=10)
-    logger.info(f"   ✓ Realizations Generated: 10")
+    logger.info("   ✓ Realizations Generated: 10")
     logger.info(f"   ✓ Blocks per Realization: {len(simulations['mean_grade']):,}")
     logger.info(f"   ✓ Global P50: {simulations['global_p50']:.3f} ppm Au")
     
