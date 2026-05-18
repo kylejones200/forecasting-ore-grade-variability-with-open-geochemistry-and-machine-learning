@@ -34,6 +34,13 @@ compare_methods = production_module.compare_methods
 
 
 
+
+def _validate(condition: bool, message: str) -> None:
+    """Assert a validation condition, raising ValueError with context on failure."""
+    if not condition:
+        raise ValueError(message)
+
+
 def main():
     """Run validation tests for all functions."""
     logger.info("BLOG 11 VALIDATION - ORE GRADE FORECASTING WITH ML")
@@ -42,8 +49,7 @@ def main():
         # Test 1: Data fetching
         logger.info("TEST 1: Fetching geochemical data...")
         df = fetch_geochemical_data()
-        if not len(df) == 250:
-            raise ValueError("Expected 250 samples")
+        _validate(len(df) == 250, "Expected 250 samples")
         if "Au" not in df.columns:
             raise ValueError("Missing Au column")
         if "lithology" not in df.columns:
@@ -62,46 +68,34 @@ def main():
         # Test 3: Spatial folds
         logger.info("TEST 3: Creating spatial cross-validation folds...")
         groups = create_spatial_folds(gdf)
-        if not len(groups) == len(gdf):
-            raise ValueError("Groups length mismatch")
-        if not len(np.unique(groups)) >= 4:
-            raise ValueError("Expected at least 4 folds")
+        _validate(len(groups) == len(gdf), "Groups length mismatch")
+        _validate(len(np.unique(groups)) >= 4, "Expected at least 4 folds")
         logger.info("✓ Spatial folds created\n")
         # Test 4: Variogram fitting
         logger.info("TEST 4: Fitting variogram...")
         V = fit_variogram(gdf)
-        if not V.sill > 0:
-            raise ValueError("Sill should be positive")
-        if not V.range > 0:
-            raise ValueError("Range should be positive")
+        _validate(V.sill > 0, "Sill should be positive")
+        _validate(V.range > 0, "Range should be positive")
         logger.info("✓ Variogram fitted\n")
         # Test 5: Ordinary Kriging
         logger.info("TEST 5: Performing Ordinary Kriging...")
         gx, gy, ok_ppm, ok_var = ordinary_kriging_predict(gdf, grid_resolution=50)
-        if not ok_ppm.shape == (50, 50):
-            raise ValueError("Unexpected grid shape")
-        if not ok_ppm.min() >= 0:
-            raise ValueError("Negative predictions found")
+        _validate(ok_ppm.shape == (50, 50), "Unexpected grid shape")
+        _validate(ok_ppm.min() >= 0, "Negative predictions found")
         logger.info("✓ Ordinary Kriging completed\n")
         # Test 6: Gaussian Process
         logger.info("TEST 6: Training Gaussian Process Regressor...")
         gp_model, gp_pred, gp_std, gpr_metrics = train_gaussian_process(gdf, groups)
-        if not len(gp_pred) == len(gdf):
-            raise ValueError("Prediction length mismatch")
-        if not len(gp_std) == len(gdf):
-            raise ValueError("Std length mismatch")
-        if not gpr_metrics["mae"] > 0:
-            raise ValueError("Invalid MAE")
-        if not 0.8 <= gpr_metrics["coverage"] <= 1.0:
-            raise ValueError("Coverage out of range")
+        _validate(len(gp_pred) == len(gdf), "Prediction length mismatch")
+        _validate(len(gp_std) == len(gdf), "Std length mismatch")
+        _validate(gpr_metrics["mae"] > 0, "Invalid MAE")
+        _validate(0.8 <= gpr_metrics["coverage"] <= 1.0, "Coverage out of range")
         logger.info("✓ Gaussian Process trained\n")
         # Test 7: XGBoost
         logger.info("TEST 7: Training XGBoost...")
         xgb_model, xgb_pred, xgb_metrics = train_xgboost(gdf, groups)
-        if not len(xgb_pred) == len(gdf):
-            raise ValueError("Prediction length mismatch")
-        if not xgb_metrics["mae"] > 0:
-            raise ValueError("Invalid MAE")
+        _validate(len(xgb_pred) == len(gdf), "Prediction length mismatch")
+        _validate(xgb_metrics["mae"] > 0, "Invalid MAE")
         logger.info("✓ XGBoost trained\n")
         # Test 8: Grid predictions
         logger.info("TEST 8: Creating prediction grid...")
@@ -112,14 +106,12 @@ def main():
             raise ValueError("Missing GPR std")
         if "xgb_pred" not in grid_results:
             raise ValueError("Missing XGB predictions")
-        if not grid_results["gp_mean"].shape == (50, 50):
-            raise ValueError("Grid shape mismatch")
+        _validate(grid_results["gp_mean"].shape == (50, 50), "Grid shape mismatch")
         logger.info("✓ Prediction grid created\n")
         # Test 9: Calibration analysis
         logger.info("TEST 9: Analyzing uncertainty calibration...")
         calib_df = analyze_uncertainty_calibration(gdf["log_Au"].values, gp_pred, gp_std, n_bins=5)
-        if not len(calib_df) >= 4:
-            raise ValueError("Expected at least 4 calibration bins")
+        _validate(len(calib_df) >= 4, "Expected at least 4 calibration bins")
         if "predicted_std" not in calib_df.columns:
             raise ValueError("Missing predicted_std")
         if "actual_rmse" not in calib_df.columns:
