@@ -11,14 +11,32 @@ Drillholes give point samples. Mines need continuous grade maps. The gap between
 
 This project uses gold grade predictions across Western Australia using three methods: Ordinary Kriging (traditional geostatistics), Gaussian Process Regression (probabilistic ML), and XGBoost (gradient boosting). The GPR model reveals prediction uncertainty, highlighting zones requiring additional sampling.
 
-## About
 
-Place the code for this article in this repository.
-The original article export is saved as `article.md`.
 
-## Files
+## Rust performance port
 
-Add your `.ipynb`, `.py`, `.yaml`, `.js`, `.ts`, or other project files here.
+Side-by-side **Python vs Rust** implementation of the numeric hot loop — rolling mean and std. Reference PyO3 benchmark: **see `benchmark_rust.py`** on a release build (local machine; run `benchmark_rust.py` to reproduce).
+
+| Path | Role |
+|------|------|
+| `src/compute_kernel.py` | Python/numpy reference kernel |
+| `rust/core/` | Pure Rust library |
+| `rust/py/` | PyO3 bindings |
+| `rust/bench/` | Standalone CLI benchmark |
+| `benchmark_rust.py` | Python vs Rust timing + correctness check |
+
+```bash
+# Rust-only CLI benchmark
+cd rust && cargo run --release -p forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_bench
+
+# Python vs Rust (PyO3)
+pip install maturin numpy
+maturin develop --release -m rust/py/Cargo.toml
+python benchmark_rust.py
+```
+
+Python ML training, solvers, and orchestration stay in Python; Rust targets the numeric hot loops. Stochastic generators validate output shapes; deterministic kernels match at tight floating-point tolerance.
+
 
 ## Disclaimer
 

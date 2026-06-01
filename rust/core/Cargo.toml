@@ -1,0 +1,9 @@
+[package]
+name = "forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_core"
+description = "Rolling mean and standard deviation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

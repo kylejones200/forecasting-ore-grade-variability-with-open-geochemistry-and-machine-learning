@@ -1,0 +1,15 @@
+[package]
+name = "forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_rs"
+description = "Python bindings (PyO3) for forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"

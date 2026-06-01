@@ -30,3 +30,14 @@ select = ["E", "F", "I", "UP"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+# Optional Rust extension — build with:
+#   pip install maturin && maturin develop --release -m rust/py/Cargo.toml
+[tool.maturin]
+manifest-path = "rust/py/Cargo.toml"
+module-name = "forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_rs"
+

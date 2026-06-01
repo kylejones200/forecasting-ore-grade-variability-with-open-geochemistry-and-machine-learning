@@ -1,0 +1,13 @@
+[package]
+name = "forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+forecasting_ore_grade_variability_with_open_geochemistry_and_machine_learning_core = { path = "../core" }
